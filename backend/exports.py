@@ -21,7 +21,7 @@ def build_export(project: dict, format: str, content: str) -> tuple[bytes, str, 
         raise ValueError("不支持的导出格式或内容")
     if format == "srt" and content == "summary":
         raise ValueError("总结无法导出为 SRT，请选择 Markdown 或 TXT")
-    title = str(project.get("title") or "Freddie Lingua")
+    title = str(project.get("title") or "Freddie Spark")
     segments = project.get("segments") or []
     lines = []
     if content == "summary":
@@ -60,6 +60,6 @@ def build_export(project: dict, format: str, content: str) -> tuple[bytes, str, 
             else:
                 heading = f"[{timestamp(start)}–{timestamp(end)}]"
                 lines += [("### " if format == "md" else "") + heading, text, ""]
-    safe_title = re.sub(r'[\x00-\x1f/\\:*?"<>|]', "_", title).strip(" .")[:100] or "Freddie-Lingua"
+    safe_title = re.sub(r'[\x00-\x1f/\\:*?"<>|]', "_", title).strip(" .")[:100] or "Freddie-Spark"
     mime = {"md": "text/markdown; charset=utf-8", "txt": "text/plain; charset=utf-8", "srt": "application/x-subrip; charset=utf-8"}[format]
     return ("\n".join(lines).rstrip() + "\n").encode("utf-8"), mime, f"{safe_title}-{content}.{format}"

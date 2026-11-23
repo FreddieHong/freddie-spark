@@ -105,7 +105,7 @@
     try {
       response = await fetch(path, { ...options, body, headers, credentials: 'same-origin', cache: 'no-store' });
     } catch (_) {
-      throw new Error('无法连接本地服务。请稍后重试，或重新打开 Freddie Lingua。');
+      throw new Error('无法连接本地服务。请稍后重试，或重新打开 Freddie Spark。');
     }
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || `操作未完成（${response.status}），请重试。`);
@@ -231,6 +231,7 @@
   }
 
   function renderTranscript(force = false) {
+    transcriptCopy?.update();
     const segments = projectSegments();
     const signature = JSON.stringify([state.language, segments]);
     if (!force && signature === state.lastRenderSignature) return;
@@ -293,6 +294,8 @@
     const signature = JSON.stringify([project?.overview || '', chapters]);
     if (signature === state.lastSummarySignature) return;
     state.lastSummarySignature = signature;
+    const sourceColumn = $('#source-column');
+    const sourceTop = sourceColumn.scrollTop;
     const hasSummary = Boolean(project?.overview || chapters.length);
     $('#summary-empty').hidden = hasSummary;
     $('#summary-content').hidden = !hasSummary;
@@ -323,6 +326,7 @@
       fragment.append(item);
     });
     $('#chapters').replaceChildren(fragment);
+    sourceColumn.scrollTop = sourceTop;
     updatePlaybackHighlight(false);
   }
 
@@ -331,6 +335,7 @@
     $('#empty-import').hidden = Boolean(project);
     $('#player').hidden = !project;
     $('#reader').hidden = !project;
+    $('#reader-empty').hidden = Boolean(project);
     $('#project-title').textContent = project ? project.title || project.file_name || '未命名视频' : '你的下一段理解，从这里开始。';
     $('#project-meta').textContent = project ? `${project.file_name || ''}${project.duration ? ` · ${formatTime(project.duration)}` : ''}` : '将本地外语视频，变成清晰的中文与重点。';
     const detected = project?.detected_language;
@@ -345,6 +350,7 @@
       $('#video-message').hidden = true;
       video.src = `/api/projects/${encodeURIComponent(project.id)}/media`;
       video.load();
+      $('#source-column').scrollTop = 0;
       $('#transcript').scrollTop = 0;
       $('#current-time').textContent = '00:00';
       $('#seek').value = '0';
@@ -372,7 +378,7 @@
       const row = state.segmentNodes.get(activeKey);
       const panel = $('#transcript');
       if (row) {
-        const rowTop = row.offsetTop - panel.offsetTop;
+        const rowTop = row.getBoundingClientRect().top - panel.getBoundingClientRect().top + panel.scrollTop;
         const rowBottom = rowTop + row.offsetHeight;
         if (rowTop < panel.scrollTop + 15 || rowBottom > panel.scrollTop + panel.clientHeight - 15) {
           panel.scrollTo({ top: Math.max(0, rowTop - panel.clientHeight * .25), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
@@ -756,6 +762,55 @@
     return parts.join('\n\n');
   }
 
+  let transcriptCopy = null;
+
+  function installTranscriptCopy() {
+    const helper = window.FreddieTranscriptCopy;
+    if (!helper) return;
+    let anchor = $('#transcript-copy-anchor');
+    if (!anchor) {
+      const heading = $('.reader-heading');
+      if (!heading) return;
+      anchor = element('span');
+      anchor.id = 'transcript-copy-anchor';
+      heading.append(anchor);
+    }
+    transcriptCopy = helper.mount({
+      anchor,
+      getContext: () => ({ segments: projectSegments(), mode: state.language, status: state.project?.status }),
+      onCopy: copyTranscript,
+    });
+  }
+
+  async function copyTranscript(format) {
+    const helper = window.FreddieTranscriptCopy;
+    if (!helper) { toast('复制功能尚未载入，请重新打开应用。'); return; }
+    const mode = state.language;
+    const segments = projectSegments();
+    let text, current;
+    try {
+      current = helper.availability(segments, mode, state.project?.status);
+      text = helper.formatTranscript(segments, mode, format);
+    } catch (error) { toast(error.message, 6500); return; }
+    const title = `${current.label} · ${format.toUpperCase()}`;
+    const success = `${title} 已复制。${current.partial ? '仅包含当前已生成内容。' : ''}`;
+    try {
+      if (bridge('copy', { text })) { toast(success); return; }
+    } catch (_) { /* Fall back to the browser clipboard if the native bridge fails. */ }
+    try {
+      await navigator.clipboard.writeText(text);
+      toast(success);
+    } catch (_) {
+      showDialog(`复制${title}`, 'copy');
+      const area = element('textarea');
+      area.value = text;
+      area.readOnly = true;
+      $('#dialog-content').append(labeledField('选择并复制以下内容', area), element('p', 'settings-note', '当前系统未开放自动剪贴板权限，可按 ⌘C 复制。'));
+      area.focus();
+      area.select();
+    }
+  }
+
   async function copySummary() {
     const text = summaryText();
     if (!text) return;
@@ -853,9 +908,16 @@
   }
 
   function installEvents() {
+    installTranscriptCopy();
     $('#import-button').addEventListener('click', chooseVideo);
     $('#empty-import-button').addEventListener('click', chooseVideo);
-    $('#workspace-button').addEventListener('click', () => { closeDialog(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('#workspace-button').addEventListener('click', () => {
+      closeDialog();
+      const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      $('#source-column').scrollTo({ top: 0, behavior });
+      $('#transcript').scrollTo({ top: 0, behavior });
+      window.scrollTo({ top: 0, behavior });
+    });
     $('#library-button').addEventListener('click', openLibrary);
     $('#mobile-library-button').addEventListener('click', openLibrary);
     $('#settings-button').addEventListener('click', () => openSettings());

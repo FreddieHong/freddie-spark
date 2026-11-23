@@ -68,7 +68,7 @@ def bundle_ffmpeg(resources: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--runtime", type=Path)
-    parser.add_argument("--output", type=Path, default=ROOT / "dist" / "Freddie Lingua.app")
+    parser.add_argument("--output", type=Path, default=ROOT / "dist" / "Freddie Spark.app")
     parser.add_argument("--reuse-runtime", action="store_true", help="重建代码时复用 app 已有运行时")
     args = parser.parse_args()
     runtime = args.runtime
@@ -87,7 +87,7 @@ def main() -> None:
     (resources / "app").mkdir(parents=True, exist_ok=True)
     (ROOT / "build/swift-cache").mkdir(parents=True, exist_ok=True)
     print("正在构建原生窗口…", flush=True)
-    run("swiftc", "-swift-version", "5", "-target", "arm64-apple-macosx14.0", "-module-cache-path", ROOT / "build/swift-cache", "-O", "-framework", "AppKit", "-framework", "WebKit", "-framework", "UniformTypeIdentifiers", ROOT / "native/FreddieLingua.swift", "-o", contents / "MacOS/FreddieLingua")
+    run("swiftc", "-swift-version", "5", "-target", "arm64-apple-macosx14.0", "-module-cache-path", ROOT / "build/swift-cache", "-O", "-framework", "AppKit", "-framework", "WebKit", "-framework", "UniformTypeIdentifiers", ROOT / "native/FreddieLingua.swift", "-o", contents / "MacOS/FreddieSpark")
     shutil.copy2(ROOT / "native/Info.plist", contents / "Info.plist")
     for folder in ("backend", "frontend"):
         shutil.copytree(ROOT / folder, resources / "app" / folder, dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))

@@ -37,12 +37,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKSc
         let menu = NSMenu()
         let appItem = NSMenuItem(); menu.addItem(appItem)
         let appMenu = NSMenu(); appItem.submenu = appMenu
-        appMenu.addItem(withTitle: "关于 Freddie Lingua", action: #selector(showAbout), keyEquivalent: "")
+        appMenu.addItem(withTitle: "关于 Freddie Spark", action: #selector(showAbout), keyEquivalent: "")
         appMenu.addItem(NSMenuItem.separator())
         appMenu.addItem(withTitle: "设置…", action: #selector(openSettings), keyEquivalent: ",")
         appMenu.addItem(NSMenuItem.separator())
-        appMenu.addItem(withTitle: "隐藏 Freddie Lingua", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
-        appMenu.addItem(withTitle: "退出 Freddie Lingua", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        appMenu.addItem(withTitle: "隐藏 Freddie Spark", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
+        appMenu.addItem(withTitle: "退出 Freddie Spark", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         let fileItem = NSMenuItem(); menu.addItem(fileItem)
         let file = NSMenu(title: "文件"); fileItem.submenu = file
         file.addItem(withTitle: "导入视频…", action: #selector(chooseVideo), keyEquivalent: "o")
@@ -67,7 +67,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKSc
     private func createWindow() {
         let screen = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 1000)
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: min(1440, screen.width - 60), height: min(980, screen.height - 60)), styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
-        window.title = "Freddie Lingua"
+        window.title = "Freddie Spark"
         window.titlebarAppearsTransparent = true
         window.backgroundColor = NSColor(srgbRed: 0.043, green: 0.055, blue: 0.075, alpha: 1)
         window.minSize = NSSize(width: 920, height: 650)
@@ -85,7 +85,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKSc
         webView.registerForDraggedTypes([.fileURL])
         webView.onFiles = { [weak self] paths in self?.sendPaths(paths) }
         window.contentView = webView
-        webView.loadHTMLString("<html><meta charset='utf-8'><body style='margin:0;background:#0b0e13;color:#91ead8;font:16px -apple-system;display:grid;place-items:center;height:100vh'><div>Freddie Lingua<span style='display:block;color:#8291a1;font-size:12px;margin-top:12px'>正在启动本地工作台…</span></div></body></html>", baseURL: nil)
+        webView.loadHTMLString("<html><meta charset='utf-8'><body style='margin:0;background:#0b0e13;color:#91ead8;font:16px -apple-system;display:grid;place-items:center;height:100vh'><div>Freddie Spark<span style='display:block;color:#8291a1;font-size:12px;margin-top:12px'>正在启动本地工作台…</span></div></body></html>", baseURL: nil)
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
@@ -135,7 +135,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKSc
         process.terminationHandler = { [weak self] task in
             DispatchQueue.main.async {
                 guard let self, !self.quitting else { return }
-                self.showError("本地处理服务已停止（\(task.terminationStatus)）。请重新打开 Freddie Lingua。\n" + (self.started ? "" : String(data: self.stderrTail, encoding: .utf8) ?? ""))
+                self.showError("本地处理服务已停止（\(task.terminationStatus)）。请重新打开 Freddie Spark。\n" + (self.started ? "" : String(data: self.stderrTail, encoding: .utf8) ?? ""))
             }
         }
         backend = process
@@ -211,7 +211,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKSc
                     }
                     let ext = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "format" })?.value ?? "md"
                     let panel = NSSavePanel(); panel.title = "保存导出内容"
-                    panel.nameFieldStringValue = "Freddie Lingua.\(ext)"
+                    panel.nameFieldStringValue = "Freddie Spark.\(ext)"
                     panel.allowedContentTypes = [UTType(filenameExtension: ext) ?? .plainText]
                     panel.canCreateDirectories = true
                     panel.beginSheetModal(for: self.window) { result in
@@ -238,13 +238,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKSc
     @objc private func openDataFolder() { if let dataDirectory { NSWorkspace.shared.open(dataDirectory) } }
     @objc private func openSettings() { webView.evaluateJavaScript("document.getElementById('settings-button')?.click()", completionHandler: nil) }
     @objc private func showAbout() {
-        let alert = NSAlert(); alert.messageText = "Freddie Lingua"
-        alert.informativeText = "听懂世界，留住重点。\n版本 1.0 · Apple Silicon\n本地语音识别 · 云端增强 · 离线保底"
+        let alert = NSAlert(); alert.messageText = "Freddie Spark"
+        alert.informativeText = "听懂世界，留住重点。\n版本 1.1 · Apple Silicon\n本地语音识别 · 云端增强 · 离线保底"
         alert.beginSheetModal(for: window)
     }
     private func showError(_ text: String) {
         let alert = NSAlert(); alert.alertStyle = .warning
-        alert.messageText = "Freddie Lingua 暂时无法继续"; alert.informativeText = text
+        alert.messageText = "Freddie Spark 暂时无法继续"; alert.informativeText = text
         alert.addButton(withTitle: "知道了"); alert.beginSheetModal(for: window)
     }
     func application(_ sender: NSApplication, openFiles filenames: [String]) { sendPaths(filenames); sender.reply(toOpenOrPrint: .success) }

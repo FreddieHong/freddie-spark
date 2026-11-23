@@ -1,6 +1,6 @@
 # Third-party components
 
-Freddie Lingua uses these components; upstream license terms continue to apply.
+Freddie Spark uses these components; upstream license terms continue to apply.
 
 - Python: Python Software Foundation License, https://www.python.org/psf/license/
 - python-build-standalone: upstream bundled notices, https://github.com/astral-sh/python-build-standalone

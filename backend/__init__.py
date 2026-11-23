@@ -1,3 +1,3 @@
-"""Freddie Lingua local application service."""
+"""Freddie Spark local application service."""
 
-__version__ = "1.0"
+__version__ = "1.1"

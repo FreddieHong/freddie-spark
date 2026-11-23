@@ -232,4 +232,4 @@ class Credentials:
                 self.persistent, self.warning = True, ""
             except Exception:
                 self._unavailable()
-                self.warning = "当前运行已清除 API 密钥，但无法确认钥匙串中的旧密钥已删除。请在“钥匙串访问”中检查 Freddie Lingua。"
+                self.warning = "当前运行已清除 API 密钥，但无法确认钥匙串中的旧密钥已删除。请在“钥匙串访问”中检查服务 com.freddie.lingua.cloud（沿用旧版密钥存储）。"

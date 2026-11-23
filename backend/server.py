@@ -1,4 +1,4 @@
-"""Authenticated, loopback-only HTTP service for Freddie Lingua.
+"""Authenticated, loopback-only HTTP service for Freddie Spark.
 
 Run: python -m backend.server --port 0 --data-dir PATH --frontend-dir PATH
 The first stdout line is the launch handshake consumed by the native shell.
@@ -386,7 +386,7 @@ class LocalHTTPServer(ThreadingHTTPServer):
 
 
 class RequestHandler(BaseHTTPRequestHandler):
-    server_version = "FreddieLingua/0.1"
+    server_version = "FreddieSpark/1.1"
     protocol_version = "HTTP/1.1"
 
     @property
@@ -423,7 +423,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         except Exception:
             session = ""
         if not secrets.compare_digest(session, self.app.session):
-            raise APIError(401, "本地会话已过期，请重新打开 Freddie Lingua。")
+            raise APIError(401, "本地会话已过期，请重新打开 Freddie Spark。")
         origin = self.headers.get("Origin")
         if origin is not None and origin != self.app.origin:
             raise APIError(403, "已拒绝非本机应用来源的请求")
@@ -548,7 +548,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     data, mime, filename = build_export(project, query.get("format", ["md"])[0], query.get("content", ["summary"])[0])
                 except ValueError as exception:
                     raise APIError(400, str(exception)) from None
-                self._headers(200, mime, len(data), {"Content-Disposition": f"attachment; filename=Freddie-Lingua.{filename.rsplit('.', 1)[-1]}; filename*=UTF-8''{quote(filename)}"})
+                self._headers(200, mime, len(data), {"Content-Disposition": f"attachment; filename=Freddie-Spark.{filename.rsplit('.', 1)[-1]}; filename*=UTF-8''{quote(filename)}"})
                 if self.command != "HEAD":
                     self.wfile.write(data)
                 return
@@ -635,7 +635,7 @@ def default_data_dir():
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Freddie Lingua 本地服务")
+    parser = argparse.ArgumentParser(description="Freddie Spark 本地服务")
     parser.add_argument("--port", type=int, default=0)
     parser.add_argument("--data-dir", type=Path, default=default_data_dir())
     parser.add_argument("--frontend-dir", type=Path, default=Path(__file__).resolve().parent.parent / "frontend")

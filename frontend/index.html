@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#0b0e13">
-  <title>Freddie Lingua</title>
+  <title>Freddie Spark</title>
   <link rel="stylesheet" href="/app.css">
+  <script defer src="/transcript-copy.js"></script>
   <script defer src="/app.js"></script>
 </head>
 <body>
   <div class="app-shell" id="app">
     <nav class="rail" aria-label="主导航">
-      <div class="monogram" aria-label="Freddie Lingua">f.</div>
+      <div class="monogram" aria-label="Freddie Spark">f.</div>
       <button class="rail-button active" id="workspace-button" aria-current="page"><span data-icon="panels"></span><span>工作台</span></button>
       <button class="rail-button" id="library-button"><span data-icon="folder"></span><span>资料库</span></button>
       <div class="rail-spacer"></div>
@@ -22,7 +23,7 @@
 
     <main class="main">
       <header class="app-header">
-        <div class="brand-block"><div class="brand">Freddie <span>Lingua</span></div><div class="brand-note">听懂世界，留住重点。</div></div>
+        <div class="brand-block"><div class="brand">Freddie <span>Spark</span></div><div class="brand-note">听懂世界，留住重点。</div></div>
         <div class="header-actions">
           <button class="icon-button mobile-library" id="mobile-library-button" aria-label="打开资料库"><span data-icon="folder"></span></button>
           <button class="button quiet" id="export-button" disabled><span data-icon="download"></span>导出</button>
@@ -46,7 +47,7 @@
       </section>
 
       <div class="workspace">
-        <section class="source-column" aria-label="视频与原文">
+        <section class="source-column" id="source-column" aria-label="视频与智能总结">
           <section class="empty-import" id="empty-import" aria-label="导入本地视频">
             <div class="empty-graphic" aria-hidden="true"><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span><span class="orbit orbit-three"></span><span class="graphic-center" data-icon="audio"></span></div>
             <div class="eyebrow">A NEW WAY TO UNDERSTAND</div>
@@ -64,8 +65,21 @@
             <div class="player-controls"><button class="icon-button" id="play-button" aria-label="播放"><span data-icon="play"></span></button><span class="play-clock"><strong id="current-time">00:00</strong><span> / </span><span id="total-time">00:00</span></span><input type="range" class="seek" id="seek" min="0" max="1" step="0.1" value="0" aria-label="视频播放位置"><button class="speed-button" id="speed-button" aria-label="切换播放速度">1.0×</button><button class="icon-button" id="fullscreen-button" aria-label="视频全屏"><span data-icon="expand"></span></button></div>
           </section>
 
+          <aside class="summary-column" aria-label="中文总结">
+            <div class="section-heading"><h2><span data-icon="sparkles"></span>智能总结 <span class="ai-label">AI</span></h2><button class="icon-button" id="copy-summary-button" aria-label="复制中文总结" disabled><span data-icon="copy"></span></button></div>
+            <div class="summary-empty" id="summary-empty"><div class="summary-empty-lines" aria-hidden="true"><span></span><span></span><span></span></div><h3>长视频，短理解。</h3><p>一段清晰的全文概览，<br>加上每个章节的关键内容。</p><div class="empty-feature"><span data-icon="scan"></span><span>先掌握全貌</span></div><div class="empty-feature"><span data-icon="list"></span><span>再深入每个段落</span></div><div class="empty-feature"><span data-icon="corner"></span><span>随时回到原文核对</span></div></div>
+            <div id="summary-content" hidden><section class="overview"><div class="overview-label"><span data-icon="scan"></span>全文概览</div><div id="overview-text"></div></section><div class="chapter-heading"><h3>分段总结</h3><span id="chapter-count"></span></div><div id="chapters"></div><p class="summary-foot"><span data-icon="corner"></span>点击章节，回到视频中的对应位置</p></div>
+          </aside>
+        </section>
+
+        <aside class="reader-column" aria-label="原文阅读工作区">
+          <section class="reader-empty" id="reader-empty" aria-label="原文阅读空状态">
+            <div class="section-heading"><h2><span data-icon="captions"></span>原文阅读</h2></div>
+            <div class="reader-empty-modes" aria-hidden="true"><span>原文</span><span>中外对照</span><span>纯中文</span></div>
+            <div class="reader-empty-content"><span data-icon="captions"></span><h3>每一句，都能读懂。</h3><p>导入视频后，带时间戳的原文与中文<br>将在这里逐步呈现。</p><span class="reader-empty-hint">三种阅读模式 · 跟随播放 · 点击定位</span></div>
+          </section>
           <section class="reader" id="reader" hidden>
-            <div class="section-heading reader-heading"><h2><span data-icon="captions"></span>原文阅读</h2><span class="language-label" id="language-label">等待识别语种</span></div>
+            <div class="section-heading reader-heading"><h2><span data-icon="captions"></span>原文阅读</h2><div class="reader-heading-tools"><span class="language-label" id="language-label">等待识别语种</span><div id="transcript-copy-anchor"></div></div></div>
             <div class="tabs" role="tablist" aria-label="字幕阅读模式">
               <button class="tab" id="tab-original" role="tab" aria-selected="false" aria-controls="transcript" data-language="original" tabindex="-1">原文</button>
               <button class="tab" id="tab-bilingual" role="tab" aria-selected="true" aria-controls="transcript" data-language="bilingual" tabindex="0">中外对照</button>
@@ -75,16 +89,10 @@
             <div class="transcript" id="transcript" role="tabpanel" aria-labelledby="tab-bilingual"><div class="content-placeholder"><span data-icon="audio"></span><h3>原文将在这里出现</h3><p>开始识别后，带时间戳的原文会逐步显示。</p></div></div>
             <div class="reader-footer"><span id="segment-count">0 句原文</span><span>点击时间，回到对应画面</span></div>
           </section>
-        </section>
-
-        <aside class="summary-column" aria-label="中文总结">
-          <div class="section-heading"><h2><span data-icon="sparkles"></span>智能总结 <span class="ai-label">AI</span></h2><button class="icon-button" id="copy-summary-button" aria-label="复制中文总结" disabled><span data-icon="copy"></span></button></div>
-          <div class="summary-empty" id="summary-empty"><div class="summary-empty-lines" aria-hidden="true"><span></span><span></span><span></span></div><h3>长视频，短理解。</h3><p>一段清晰的全文概览，<br>加上每个章节的关键内容。</p><div class="empty-feature"><span data-icon="scan"></span><span>先掌握全貌</span></div><div class="empty-feature"><span data-icon="list"></span><span>再深入每个段落</span></div><div class="empty-feature"><span data-icon="corner"></span><span>随时回到原文核对</span></div></div>
-          <div id="summary-content" hidden><section class="overview"><div class="overview-label"><span data-icon="scan"></span>全文概览</div><div id="overview-text"></div></section><div class="chapter-heading"><h3>分段总结</h3><span id="chapter-count"></span></div><div id="chapters"></div><p class="summary-foot"><span data-icon="corner"></span>点击章节，回到视频中的对应位置</p></div>
         </aside>
       </div>
 
-      <footer class="app-footer"><span><span data-icon="shield"></span>视频保留在本地 <span class="footer-divider">·</span><span id="footer-mode">本地识别，按设置翻译与总结</span></span><span class="footer-signature">FREDDIE LINGUA <span>01</span></span></footer>
+      <footer class="app-footer"><span><span data-icon="shield"></span>视频保留在本地 <span class="footer-divider">·</span><span id="footer-mode">本地识别，按设置翻译与总结</span></span><span class="footer-signature">FREDDIE SPARK <span>1.1</span></span></footer>
     </main>
   </div>
 
