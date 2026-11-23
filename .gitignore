@@ -1,0 +1,10 @@
+.runtime/
+.venv/
+.tools/
+.freddie-data/
+build/
+dist/
+__pycache__/
+*.pyc
+.DS_Store
+.env

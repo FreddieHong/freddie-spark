@@ -1,0 +1,4 @@
+# Apple Silicon / Python 3.12. Models are downloaded separately, from the app.
+mlx-whisper>=0.4.2,<0.5
+mlx-lm>=0.24.1,<0.31
+huggingface-hub>=0.28,<1
